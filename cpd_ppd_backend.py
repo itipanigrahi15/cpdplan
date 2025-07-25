@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -7,18 +6,17 @@ CORS(app)
 
 entries = []
 
-@app.route("/entries", methods=["GET"])
-def get_entries():
-    return jsonify(entries), 200
+@app.route('/entries', methods=['GET', 'POST'])
+def handle_entries():
+    if request.method == 'POST':
+        data = request.get_json()
+        entries.append(data)
+        return jsonify({'message': 'Entry added'}), 201
+    return jsonify(entries)
 
-@app.route("/entries", methods=["POST"])
-def add_entry():
-    data = request.get_json()
-    required_fields = {"type", "performed_by", "count", "status"}
-    if not data or not required_fields.issubset(data):
-        return jsonify({"error": "Missing required fields"}), 400
-    entries.append(data)
-    return jsonify({"message": "Entry added successfully"}), 201
+@app.route('/')
+def home():
+    return "CPD/PPD Backend is running!"
 
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000)
